@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		521EEFB9287EA83A00BA40B5 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 521EEFB8287EA83A00BA40B5 /* main.cpp */; };
+		521EEFC7287EA89900BA40B5 /* MJTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 521EEFBF287EA89800BA40B5 /* MJTest.cpp */; };
+		521EEFC8287EA89900BA40B5 /* MJHand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 521EEFC3287EA89900BA40B5 /* MJHand.cpp */; };
+		521EEFC9287EA89900BA40B5 /* MJCLassV5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 521EEFC4287EA89900BA40B5 /* MJCLassV5.cpp */; };
+		521EEFCA287EA89900BA40B5 /* MJTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 521EEFC5287EA89900BA40B5 /* MJTools.cpp */; };
+		52E38102292DAB97002CBCC1 /* MJCoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 52E38100292DAB97002CBCC1 /* MJCoder.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +30,16 @@
 /* Begin PBXFileReference section */
 		521EEFB5287EA83A00BA40B5 /* MJV5 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MJV5; sourceTree = BUILT_PRODUCTS_DIR; };
 		521EEFB8287EA83A00BA40B5 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		521EEFBF287EA89800BA40B5 /* MJTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MJTest.cpp; sourceTree = "<group>"; };
+		521EEFC0287EA89800BA40B5 /* MJTest.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MJTest.hpp; sourceTree = "<group>"; };
+		521EEFC1287EA89900BA40B5 /* MJCLassV5.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MJCLassV5.hpp; sourceTree = "<group>"; };
+		521EEFC2287EA89900BA40B5 /* MJHand.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MJHand.hpp; sourceTree = "<group>"; };
+		521EEFC3287EA89900BA40B5 /* MJHand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MJHand.cpp; sourceTree = "<group>"; };
+		521EEFC4287EA89900BA40B5 /* MJCLassV5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MJCLassV5.cpp; sourceTree = "<group>"; };
+		521EEFC5287EA89900BA40B5 /* MJTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MJTools.cpp; sourceTree = "<group>"; };
+		521EEFC6287EA89900BA40B5 /* MJTools.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MJTools.hpp; sourceTree = "<group>"; };
+		52E38100292DAB97002CBCC1 /* MJCoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MJCoder.cpp; sourceTree = "<group>"; };
+		52E38101292DAB97002CBCC1 /* MJCoder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MJCoder.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +72,17 @@
 		521EEFB7287EA83A00BA40B5 /* MJV5 */ = {
 			isa = PBXGroup;
 			children = (
+				521EEFC4287EA89900BA40B5 /* MJCLassV5.cpp */,
+				521EEFC1287EA89900BA40B5 /* MJCLassV5.hpp */,
+				521EEFC3287EA89900BA40B5 /* MJHand.cpp */,
+				521EEFC2287EA89900BA40B5 /* MJHand.hpp */,
+				521EEFBF287EA89800BA40B5 /* MJTest.cpp */,
+				521EEFC0287EA89800BA40B5 /* MJTest.hpp */,
+				521EEFC5287EA89900BA40B5 /* MJTools.cpp */,
+				521EEFC6287EA89900BA40B5 /* MJTools.hpp */,
 				521EEFB8287EA83A00BA40B5 /* main.cpp */,
+				52E38100292DAB97002CBCC1 /* MJCoder.cpp */,
+				52E38101292DAB97002CBCC1 /* MJCoder.hpp */,
 			);
 			path = MJV5;
 			sourceTree = "<group>";
@@ -89,7 +114,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 1340;
+				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					521EEFB4287EA83A00BA40B5 = {
 						CreatedOnToolsVersion = 13.4.1;
@@ -119,7 +144,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52E38102292DAB97002CBCC1 /* MJCoder.cpp in Sources */,
+				521EEFC7287EA89900BA40B5 /* MJTest.cpp in Sources */,
+				521EEFCA287EA89900BA40B5 /* MJTools.cpp in Sources */,
 				521EEFB9287EA83A00BA40B5 /* main.cpp in Sources */,
+				521EEFC9287EA89900BA40B5 /* MJCLassV5.cpp in Sources */,
+				521EEFC8287EA89900BA40B5 /* MJHand.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,6 +189,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -217,6 +248,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -238,7 +270,9 @@
 		521EEFBD287EA83A00BA40B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -246,7 +280,9 @@
 		521EEFBE287EA83A00BA40B5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -57,9 +57,11 @@ private:
     void CoderHP(unordered_map<int32_t, int> &T);
   //  void CoderHP2(vector<uint32_t> &T);
     void checkHP(MJ_C_LocationBase &L, unordered_map<int32_t, TT> &T);
+    void Init(int BeginN, int m); //初始化
+    void CoderTing(unordered_map<int32_t, int> &T);
 public:
-    void Init(); //初始化
     void TestCoderHP();
+    void TestTing();
 };
 
 class unionTest{

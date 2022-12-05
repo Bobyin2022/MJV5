@@ -36,10 +36,10 @@ int main(int argc, const char * argv[]) {
 //    T2.TestDKSCombList();
 //    T2.TestOkTable();
 //    T2.TestHandCoder();
-    T2.TestTing();
+//    T2.TestTing();
     
-//    TPer.Init();
 //    TPer.TestCoderHP();
+    TPer.TestTing();
 //    T3.test();
     return 0;
 }

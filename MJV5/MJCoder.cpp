@@ -526,6 +526,7 @@ int MJ_C_OKTable::append(int Code, MJ_C_DKSCombList &DKS, uint32_t DC,uint32_t K
  2位，{0，1，2}的二进制数
  {0，1}：3n+2牌型；
  {2}：7对牌型；
+ {3}: 不靠牌型；
  
  如果V={0，1}，则A+B区一共4+(1+4)*4=24位，分别为
     ----------A区，对区（麻将头）--------------
@@ -637,22 +638,34 @@ bool MJ_C_HandCoder::isHu(MJ_C_CoderHPPX &HPD){
     a)所有花色都在7对区找到，7对牌型胡牌
     b)所有花色V相加等于1，3n+2牌型
  */
-    int ValueNor[MJ_E_HS_Hua],Value7D[MJ_E_HS_Hua]; //Normal和7D的Value
+    int ValueNor[MJ_E_HS_Hua]={0,0,0,0},Value7D[MJ_E_HS_Hua]={0,0,0,0}; //Normal和7D的Value
     MJ_S_CodeHPPX PXNor, PX7D; //Normal和7D的HP数据
     int VNor=0, V7D=0;
     
-    //查表
-    for(int i=0;i<MJ_E_HS_Hua;i++){
+    //查表,筒万条
+    for(int i=0;i<MJ_E_HS_Feng;i++){
         if (HSCode[i]<2) continue; //本花色没有编码数据
         //查Normal表
-        if ((ValueNor[i]=OKTable->Find(HSCode[i],(MJ_E_HuaSe)i))!=-1) {
+        if ((ValueNor[i]=OKTable->FindN(HSCode[i]))!=-1) {
             CT.getValuePX(ValueNor[i], PXNor, i);
+            VNor+=PXNor.V;
+        }else VNor+=-99;
+        if ((Value7D[i]=OKTable->FindN(((1<<31)|HSCode[i])))!=-1) {
+            CT.getValuePX(Value7D[i], PX7D, i);
+            V7D+=PX7D.V;
+        }else V7D+=-99;
+    }
+    //查表,风
+    if (HSCode[MJ_E_HS_Feng]>=2){  //风有数据
+        //查Normal表
+        if ((ValueNor[MJ_E_HS_Feng]=OKTable->FindF(HSCode[MJ_E_HS_Feng]))!=-1) {
+            CT.getValuePX(ValueNor[MJ_E_HS_Feng], PXNor, MJ_E_HS_Feng);
             VNor+=PXNor.V;
         }else VNor+=-99;
         
         //查7d表
-        if ((Value7D[i]=OKTable->Find(((1<<31)|HSCode[i]),(MJ_E_HuaSe)i))!=-1) {
-            CT.getValuePX(Value7D[i], PX7D, i);
+        if ((Value7D[MJ_E_HS_Feng]=OKTable->FindF(((1<<31)|HSCode[MJ_E_HS_Feng])))!=-1) {
+            CT.getValuePX(Value7D[MJ_E_HS_Feng], PX7D, MJ_E_HS_Feng);
             V7D+=PX7D.V;
         }else V7D+=-99;
     }
@@ -730,7 +743,7 @@ bool MJ_C_DKSCombList::setDKSNum(int D,int K,int S){
     return true;
 }
 
-bool MJ_C_HandCoder::isTing(set<int> &Ids){
+bool MJ_C_HandCoder::isTing(MJ_C_CardsG &Ids){
  /*   计算手中牌是否上听，返回是否，如果上听，Ids存放听的牌
   算法：
   1、张数为3n+1；
@@ -738,85 +751,75 @@ bool MJ_C_HandCoder::isTing(set<int> &Ids){
   3、对于没查到的，增加1-9，看是否能查到，查到加入结果集
   4、加入{1，9}后都没查到，则不听
   */
-    MJConstV2 MJC;
+ //   MJConstV2 MJC;
     
     if (CardNum%3!=1) return false; //张数不对
     MJ_E_HuaSe HS7D=MJ_E_HS_End, HSNor=MJ_E_HS_End;
     int t1=0;
-    uint8_t HSVBit[MJ_E_HS_Hua]={0,0,0,0}; //三位标识哪种牌型找到
     
-    //查找手中牌所有花色的Value；先找7对
-    int V7D=0,VNor=0,VSp=0;
-    for (int i=0; i<MJ_E_HS_Hua; i++){
-        uint32_t Value;
-        if (HSCode[i]) {
-           // CT.ShowCode32(HSCode[i]);
-            Value=OKTable->Find(((1<<31)|HSCode[i]),(MJ_E_HuaSe)i); //7对
-            if (Value!=-1) HSVBit[i]|=(1<<1); //7d 1位 找到
-            else HS7D=(MJ_E_HuaSe)i;
-            Value=OKTable->Find(HSCode[i],(MJ_E_HuaSe)i); //常规
+    //遍历手中牌，确定可能的听牌类型
+    int V7D=(CardNum==13)?2:0,VNor=1,VSp=(CardNum==13)?4:0; //假设只有一种花色，则均有可能
+    //查Nor表
+    for (int i=0; i<MJ_E_HS_Feng; i++){
+        uint32_t Value=0;
+        if (HSCode[i]) { //这个花色有牌
+            if (CardNum==13){ //13张才找7对
+                Value=OKTable->FindN(((1<<31)|HSCode[i])); //7对
+                if (Value!=-1) V7D+=2; //7d 找到
+                else HS7D=(MJ_E_HuaSe)i;
+            }
+            Value=OKTable->FindN(HSCode[i]); //常规
             if (Value!=-1){
-                if (CT.getValveV(Value)==3) {HSNor=(MJ_E_HuaSe)i; HSVBit[i]|=(1<<2);} //特殊牌，2位
-                else HSVBit[i]|=1; //3n+2，0位，
+                if ((CT.getValveV(Value)==3)&&(CardNum==13)) { HSNor=(MJ_E_HuaSe)i; VSp+=4;} //13张才找特殊牌，
+                else VNor+=1; //3n+2，0位，
             }
             else HSNor=(MJ_E_HuaSe)i;
-            VSp +=(HSVBit[i]&4);
-            V7D +=(HSVBit[i]&2);
-            VNor+=(HSVBit[i]&1);
         }else t1++;
     }
+    //查风表
+    uint32_t Value=0;
+    if (HSCode[MJ_E_HS_Feng]) { //这个花色有牌
+        Value=OKTable->FindF(((1<<31)|HSCode[MJ_E_HS_Feng])); //7对
+        if (Value!=-1) V7D+=2; //7d 找到
+        else HS7D=MJ_E_HS_Feng;
+        Value=OKTable->FindF(HSCode[MJ_E_HS_Feng]); //常规
+        if (Value!=-1){
+            if (CT.getValveV(Value)==3) { HSNor=MJ_E_HS_Feng; VSp+=4;} //特殊牌，
+            else VNor+=1; //3n+2，0位，
+        }
+        else HSNor=MJ_E_HS_Feng;
+    }else t1++;
     
-    bool is7D=(V7D==(3-t1)*2), //只有一个花色没找到
-        isNor=(VNor==(3-t1)), //只有一个花色没找到
-        isSP=((VSp==16)||(VSp==12)); //一个或者没有花色没找到
     bool Found7D=false, FoundNor=false, FoundSP=false;
-    if (CardNum<13) is7D=isSP=false; //有吃出的牌，肯定不是7对和不靠；
-    //7对牌型；
-    if (is7D) {
-        for (int i=0;i<9;i++){
-            uint32_t NCode=CT.CodeAdd1No(HSCode[HS7D], i);
-            if (NCode>0){
-                if (OKTable->Find(((1<<31)|NCode),HS7D)!=-1) {
-                    Ids.insert(MJC.getNewCardID(i, HS7D, MJ_E_PX_NULL));
-                    Found7D=true;
-                }
-            }
-        }
-    }
-    if (isNor) {
-        for (int i=0;i<9;i++){
-            uint32_t NCode=CT.CodeAdd1No(HSCode[HSNor], i),SPV;
-            if (NCode>0){
-                if ((SPV=OKTable->Find(NCode,HSNor))!=-1) {
-    //                CT.ShowCode32(NCode);
-   //                 CT.showValue(SPV);
-                    if (CT.getValveV(SPV)<2){
-                        Ids.insert(MJC.getNewCardID(i, HSNor, MJ_E_PX_NULL));
-                        FoundNor=true;
-                    }
-                }
-            }
-        }
-    }
-    if (isSP) {
-        for (int j=0; j<MJ_E_HS_Hua; j++){
-            for (int i=0;i<9;i++){
-                uint32_t NCode=CT.CodeAdd1No(HSCode[j], i),SPV;
-                if (NCode>0){
-  //                  if (NCode==306783239)
-    //                    CT.ShowCode32(NCode);
-                    if ((SPV=OKTable->Find(NCode,(MJ_E_HuaSe)j))!=-1) {
-                        if (CT.getValveV(SPV)==3){
-      //                      CT.ShowCode32(NCode);
-        //                    CT.showValue(SPV);
-                            Ids.insert(MJC.getNewCardID(i, (MJ_E_HuaSe)j, MJ_E_PX_NULL));
-                            FoundSP=true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
+    if (VNor==(4-t1)) //普通牌型
+        FoundNor=addTindID(Ids, HSNor, 1); //3n+2牌型，只有一个花色没找到
+    else if ((V7D==((4-t1)<<1))&&(V7D>0)) //七对牌型
+            Found7D=addTindID(Ids, HS7D, 2); //7对牌型，只有一个花色没找到
+        else if ((VSp==20)||(VSp==16)) //不靠牌型，一个或者没有花色没找到
+            for (int j=0; j<MJ_E_HS_Hua; j++)
+                FoundNor|=addTindID(Ids, (MJ_E_HuaSe)j, 3);
     return Found7D|FoundSP|FoundNor;
+}
+
+bool MJ_C_HandCoder::addTindID(MJ_C_CardsG &Ids,MJ_E_HuaSe HS,int type){
+    MJConstV2 MJC;
+    bool Found=false;
+    for (int i=0;i<9;i++){
+        uint32_t NCode=(CT.CodeAdd1No(HSCode[HS], i)|((type==2)?(1<<31):0)),Value,V;
+        if (NCode>0){
+            Value=OKTable->FindAll(NCode, HS);
+            if (Value!=-1) {
+                V=CT.getValveV(Value);
+                if (((type==2)&&(V==2))|| //是7对
+                    ((type==1)&&(V<2))||  //是Nor牌型
+                    ((type==3)&&(V==3)))   //是特殊牌
+                {
+ //                   CT.showValue(Value);
+                    Ids.insert(MJC.getNewCardID(i, HS, MJ_E_PX_NULL));
+                    Found=true;
+                }
+            }
+        }
+    }
+    return Found;
 }

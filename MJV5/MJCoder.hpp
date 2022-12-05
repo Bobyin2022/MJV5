@@ -200,18 +200,35 @@ private:
     void CreatDKS(); // 根据DKSs的组合数列表，追加Oktable的牌型
 public:
     MJ_C_OKTable(string s,int ZS=MJ_MaxPXNum*3+2):Name(s){Init(ZS);}; //明确
-    uint32_t Find(uint32_t Code, MJ_E_HuaSe HS){ //查Code， 返回-1为没找到，>=0为找到，返回V
+    uint32_t FindN(uint32_t Code){ //查NormalCode， 返回-1为没找到，>=0为找到，返回V
         if (Code==0) return -1; //不找0；
-        if (HS==MJ_E_HS_Feng) {
-            const auto& got = DataF.find(Code);
-            return (got == DataF.end())?-1:got->second;
-        }else{
-            const auto& got = DataN.find(Code);
-            return (got == DataN.end())?-1:got->second;
-        }
+        const auto& got = DataN.find(Code);
+        return (got == DataN.end())?-1:got->second;
+    }
+    uint32_t FindF(uint32_t Code){ //查FengCode， 返回-1为没找到，>=0为找到，返回V
+        if (Code==0) return -1; //不找0；
+        const auto& got = DataF.find(Code);
+        return (got == DataF.end())?-1:got->second;
+        
+    }
+    inline uint32_t FindAll(uint32_t Code,MJ_E_HuaSe HS){ //查AllCode， 返回-1为没找到，>=0为找到，返回V
+        return (HS==MJ_E_HS_Feng)?FindF(Code):FindN(Code);
     }
     void Show(bool detail=false);
     inline const string getName(){ return Name;}; //获取本实例名字
+};
+
+class MJ_C_CardsG{
+public:
+    set<int> Ids;
+ //   vector<int> Ids;
+    inline void insert(int c){
+        Ids.insert(c);
+ //       Ids.emplace_back(c);
+    }
+    inline void clear(){
+        Ids.clear();
+    }
 };
 
 class MJ_C_HandCoder{ //一手牌，用Coder编码
@@ -222,6 +239,7 @@ private:
     MJ_C_CoderTools CT; //编码工具
     MJ_C_OKTable *OKTable=NULL; //筒万条OKTable和风向的OKTable
     inline void HSCodeClear(){HSCode[0]=HSCode[1]=HSCode[2]=HSCode[3]=0;} //重置HSCode；
+    bool addTindID(MJ_C_CardsG &Ids,MJ_E_HuaSe HS,int type);
 public:
     MJ_C_HandCoder(MJ_C_OKTable &T):OKTable(&T){}
     inline int getHSCode(MJ_E_HuaSe HS){return HSCode[HS];}
@@ -240,7 +258,7 @@ public:
     }  //加入指定花色牌的编码
     
     bool isHu(MJ_C_CoderHPPX &HPD); //计算手中牌是否胡牌
-    bool isTing(set<int> &Ids); //计算手中牌是否上听
+    bool isTing(MJ_C_CardsG &Ids); //计算手中牌是否上听
     void Show(); 
 };
 

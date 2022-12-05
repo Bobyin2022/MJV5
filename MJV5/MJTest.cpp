@@ -288,6 +288,7 @@ void MJClassTest::TestComb(){
 void MJClassTest::TestHandCoder(){
     vector<pair<string,vector <int>>> C={
         {"全不靠    ",  { 0, 3, 6, 11,14,22, 25,28,30, 31,32,33, 34,35}},  //全不靠
+        {"全带幺    ",  { 0, 1, 2,  0, 1, 2,  6, 7, 8, 18,18,18, 10,10}}, //全带幺
         {"清龙七对  ",  { 0, 0, 0,  0, 1, 1,  1, 1, 3,  3, 4, 4,  5, 5}}, //青龙七对
         {"将对      ",  { 1, 1, 4,  4, 7, 7, 11,11,14, 14,17,17, 17,17}}, //
         {"全带幺    ",  { 0, 1, 2,  0, 1, 2,  6, 7, 8, 18,18,18, 10,10}}, //全带幺
@@ -358,31 +359,22 @@ void MJClassTest::TestDKSCombList(){
     DKSFeng.Show();
 }
 
-void MJTestPer::Init(){
-    vector<TT> t1,t2,t3,t4;
+void MJTestPer::Init(int BeginN, int m){
     
-/*    T1.clear();
+    T1.clear();
     T2.clear();
     T3.clear();
-    T4.clear(); */
+    T4.clear();
     
-    Comb2List(T1, 18, 14);
-    Comb2List(T2, 21, 14);
-    Comb2List(T3, 24, 14);
-    Comb2List(T4, 27, 14);
-    
-/*    Comb2List2(CodeList1, 18, 14);
-    Comb2List2(CodeList2, 21, 14);
-    Comb2List2(CodeList3, 24, 14);
-    Comb2List2(CodeList4, 27, 14); */
+    Comb2List(T1, BeginN, m);
+    Comb2List(T2, BeginN+3, m);
+    Comb2List(T3, BeginN+6, m);
+    Comb2List(T4, BeginN+9, m);
 }
 
 void MJTestPer::Comb2List(unordered_map<int32_t, int> &T, int n, int m){
     MJ_C_CoderTools CT;
     vector<uint32_t> cl, CodeList;
-    int HSCode;
- //   TT Cards;
-    int k=0;
     
     cout << "Init Data, C(" << n << ',' << m << ")." << endl;
     cout << "Get ComList...";
@@ -394,14 +386,9 @@ void MJTestPer::Comb2List(unordered_map<int32_t, int> &T, int n, int m){
     auto el1 = chrono::duration_cast<std::chrono::nanoseconds>(e1 - b1);
     printf("耗时: %.3f 秒。\n", el1.count() * 1e-9);
     
- //   CT.showAnyBit(31);
- //   CT.showAnyBit(511); //C1    uint32_t    153391688 Code    uint32_t    19173961 C1    uint32_t    153391688
-//    CT.showAnyBit(153391688);
     cout << "Add HandCards..." ;
     b1=chrono::high_resolution_clock::now();
- //   CT.CombList2Codes(cl, CodeList, MJ_E_PX_NULL, MJ_E_HS_Tong, m/9);
     for (auto t:cl) T[CT.encode32(t)]=1;
- //       T[CT.Comb2Code(t, n)]=1;
     e1 = chrono::high_resolution_clock::now();
     cout << "OK! Total:" << T.size() << endl ;
     el1 = chrono::duration_cast<std::chrono::nanoseconds>(e1 - b1);
@@ -440,16 +427,8 @@ void MJTestPer::CoderHP(unordered_map<int32_t, int> &T){
 }
 
 void MJTestPer::TestCoderHP(){
-    MJ_C_OKTable OKT("OKTable"); //筒万条，不是风，有7对
-    MJ_C_HandCoder HC(OKT);
-    MJ_C_Loc_CMXZDZ XZ;
-    MJ_C_CoderHPPX HPD;
-    MJ_C_CoderTools CT;
     
-/*    CoderHP2(CodeList1);
-    CoderHP2(CodeList1);
-    CoderHP2(CodeList1);
-    CoderHP2(CodeList1);*/
+    Init(18,14);
     
     CoderHP(T1);
     CoderHP(T2);
@@ -475,6 +454,42 @@ void MJTestPer::TestCoderHP(){
     }
     cout << "查表 Y,回溯 N：" << CY1.size() << endl;
  */
+}
+
+void MJTestPer::TestTing(){
+    Init(18,10);
+    
+    CoderTing(T1);
+    CoderTing(T2);
+    CoderTing(T3);
+    CoderTing(T4);
+}
+
+void MJTestPer::CoderTing(unordered_map<int32_t, int> &T){
+    MJ_C_OKTable OKT("OkTable"); //筒万条，不是风，有7对
+    MJ_C_HandCoder HC(OKT);
+    MJConstV2 MJC;
+    MJ_C_CoderHPPX HPD;
+    
+    MJ_C_CardsG Ids;
+    
+    int totH=0;
+    
+    cout << "Test Coder HP, Total " << T.size() << "..." << endl;
+    auto b1=chrono::high_resolution_clock::now();
+    for(auto n:T){
+        HC.addCards(n.first, MJ_E_HS_Tong);
+        Ids.clear();
+        if (HC.isTing(Ids)) {
+            totH++;
+        }
+    }
+    auto e1 = chrono::high_resolution_clock::now();
+    cout << "OK! Ting Num:" << totH << "   " << totH*100/T.size() << '%' << endl ;
+    auto el1 = chrono::duration_cast<std::chrono::nanoseconds>(e1 - b1);
+    double el2=el1.count() * 1e-9;
+    double per=T.size()/el2/10000;
+    printf("耗时: %.3f 秒, %.2f 万笔/s \n\n", el2,per);
 }
 
 void MJTestPer::checkHP(MJ_C_LocationBase &L, unordered_map<int32_t, TT> &T){
@@ -548,7 +563,8 @@ void unionTest::test(){
 
 void MJClassTest::TestTing(){
     vector<pair<string,vector <int>>> C={
-        {"清一色    ",  { 2, 2, 3,  3, 3, 4,  4, 4, 4,  5, 5, 5,  6 }},  //七星不靠
+        {"全不靠    ",  { 0, 3, 6, 11,14,22, 25,28,30, 31,32,33, 34 }},  //全不靠
+        {"清一色    ",  { 2, 2, 3,  3, 3, 4,  4, 4, 4,  5, 5, 5,  6 }},
         {"九莲宝灯  ",  { 0, 0, 0,  1, 2, 3,  4, 5, 6,  7, 8, 8,  8 }},  //全不靠
         {"清龙七对  ",  { 0, 0, 0,  0, 1, 1,  1, 1, 3,  3, 4, 4,  5 }}, //青龙七对
         {"将对      ",  { 1, 1, 4,  4, 7, 7, 11,11,14, 14,17,17, 17 }}, //
@@ -576,25 +592,8 @@ void MJClassTest::TestTing(){
     MJConstV2 MJC;
     MJ_C_CoderHPPX HPD;
     MJ_C_CoderTools CT;
-    set<int> Cards;
+    MJ_C_CardsG Cards;
     
-    /*    MJ_C_CoderTools CT;
-     [0]    uint32_t    268960771
-     [1]    uint32_t    33619970
-     [2]    uint32_t    4202498
-     [3]    uint32_t    306783239
-     [3]    uint32_t    920256526
-     Value    int    16781581
- 
- [1]    int    2291644
- [0]    int    4790754
- 00 0000 0001 0010 0100 0110 0111 1000 10
-      0     1    2  4     6    7   8 */
-
- //   CT.ShowCode32(920256526);
- //   CT.ShowCode32(33619970);
- //   CT.ShowCode32(4202498);
- //   CT.ShowCode32(306783239);
    
     cout << "---测试是否听牌---" << endl;
     for (auto n:C){
@@ -603,7 +602,7 @@ void MJClassTest::TestTing(){
         Cards.clear();
         if (HC.isTing(Cards)) {
             cout << "听了：|" ;
-            for (auto n:Cards)
+            for (auto n:Cards.Ids)
                 cout << MJC.getNCID_HZ(n) << '.';
         }
         cout << endl;
